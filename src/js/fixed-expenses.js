@@ -26,7 +26,7 @@ const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, c => ({
 const dateLabel = value => value
   ? new Intl.DateTimeFormat("es-AR").format(new Date(value + "T12:00:00"))
   : "—";
-const id = () => crypto.randomUUID ? crypto.randomUUID() : \`gf-\${Date.now()}-\${Math.random().toString(16).slice(2)}\`;
+const id = () => crypto.randomUUID ? crypto.randomUUID() : `gf-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 const sumPaid = item => (item.payments || []).reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
 const remaining = item => Math.max(0, Number(item.amount || 0) - sumPaid(item));
 const isPaid = item => remaining(item) < 0.005;
@@ -79,7 +79,7 @@ export async function mountFixedExpenses(container) {
   };
   const categoryOptions = selected => [
     '<option value="">Sin categoría</option>',
-    ...categories.map(category => \`<option value="\${escapeHTML(category.name)}" \${category.name === selected ? "selected" : ""}>\${escapeHTML(category.name)}</option>\`),
+    ...categories.map(category => `<option value="${escapeHTML(category.name)}" ${category.name === selected ? "selected" : ""}>${escapeHTML(category.name)}</option>`),
     '<option value="__new__">＋ Agregar categoría…</option>'
   ].join("");
 
@@ -101,61 +101,60 @@ export async function mountFixedExpenses(container) {
     const monthOptions = [...new Set([monthNow(), ...expenses.map(item => item.dueDate?.slice(0, 7)).filter(Boolean)])]
       .sort((a, b) => b.localeCompare(a));
 
-    container.innerHTML = \`
+    container.innerHTML = `
       <section class="fixed-screen">
         <div class="fixed-toolbar">
-          <div><p class="eyebrow">OBLIGACIONES Y VENCIMIENTOS</p><h2>\${escapeHTML(monthLabel(selectedMonth))}</h2></div>
+          <div><p class="eyebrow">OBLIGACIONES Y VENCIMIENTOS</p><h2>${escapeHTML(monthLabel(selectedMonth))}</h2></div>
           <label class="month-picker">Consultar mes
-            <select id="fixed-month">\${monthOptions.map(month => \`<option value="\${month}" \${month === selectedMonth ? "selected" : ""}>\${escapeHTML(monthLabel(month))}</option>\`).join("")}</select>
+            <select id="fixed-month">${monthOptions.map(month => `<option value="${month}" ${month === selectedMonth ? "selected" : ""}>${escapeHTML(monthLabel(month))}</option>`).join("")}</select>
           </label>
         </div>
         <div class="fixed-summary">
-          <article class="fixed-stat paid"><span>Pagado este mes</span><strong>\${money.format(paidThisMonth)}</strong><small>Según la fecha de cada pago</small></article>
-          <article class="fixed-stat pending"><span>Saldo pendiente</span><strong>\${money.format(pendingTotal)}</strong><small>Incluye obligaciones anteriores sin cancelar</small></article>
+          <article class="fixed-stat paid"><span>Pagado este mes</span><strong>${money.format(paidThisMonth)}</strong><small>Según la fecha de cada pago</small></article>
+          <article class="fixed-stat pending"><span>Saldo pendiente</span><strong>${money.format(pendingTotal)}</strong><small>Incluye obligaciones anteriores sin cancelar</small></article>
         </div>
         <article class="panel fixed-form-panel">
-          <h3>\${editingId ? "Editar obligación" : "Registrar gasto fijo"}</h3>
+          <h3>${editingId ? "Editar obligación" : "Registrar gasto fijo"}</h3>
           <form id="fixed-form" class="fixed-form">
             <label>Concepto<input id="fixed-concept" name="concept" maxlength="100" list="fixed-concepts" placeholder="Ej. Ecogas, EPEC, internet…" required></label>
-            <datalist id="fixed-concepts">\${[...new Set(expenses.map(item => item.concept))].map(value => \`<option value="\${escapeHTML(value)}"></option>\`).join("")}</datalist>
+            <datalist id="fixed-concepts">${[...new Set(expenses.map(item => item.concept))].map(value => `<option value="${escapeHTML(value)}"></option>`).join("")}</datalist>
             <label>Importe total<input id="fixed-amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 125000,50" required></label>
-            <label>Vencimiento<input id="fixed-due" name="dueDate" type="date" value="\${today()}" required></label>
-            <label>Categoría (opcional)<select id="fixed-category" name="category">\${categoryOptions("")}</select></label>
-            <div class="fixed-form-actions"><button class="primary-button" type="submit">\${editingId ? "Guardar cambios" : "Guardar obligación"}</button>\${editingId ? '<button class="secondary-button" id="fixed-cancel" type="button">Cancelar</button>' : ""}</div>
+            <label>Vencimiento<input id="fixed-due" name="dueDate" type="date" value="${today()}" required></label>
+            <label>Categoría (opcional)<select id="fixed-category" name="category">${categoryOptions("")}</select></label>
+            <div class="fixed-form-actions"><button class="primary-button" type="submit">${editingId ? "Guardar cambios" : "Guardar obligación"}</button>${editingId ? '<button class="secondary-button" id="fixed-cancel" type="button">Cancelar</button>' : ""}</div>
           </form>
           <p class="fixed-hint">La obligación queda pendiente hasta que registres un pago. No se descuenta del balance por su vencimiento.</p>
         </article>
-        <div class="income-list-heading"><h3>Obligaciones</h3><span>\${monthItems.length} registradas</span></div>
+        <div class="income-list-heading"><h3>Obligaciones</h3><span>${monthItems.length} registradas</span></div>
         <div class="fixed-list">
-          \${monthItems.length ? monthItems.map(item => {
+          ${monthItems.length ? monthItems.map(item => {
             const paid = sumPaid(item);
             const balance = remaining(item);
-            const paid = sumPaid(item);
             const status = isPaid(item) ? "Pagada" : (item.dueDate < today() ? "Vencida" : "Pendiente");
-            return \`
+            return `
               <article class="fixed-row">
                 <div class="fixed-row-top">
-                  <div class="fixed-row-title"><strong>\${escapeHTML(item.concept)}</strong><span class="fixed-status \${status === "Pagada" ? "is-paid" : status === "Vencida" ? "is-overdue" : "is-pending"}">\${status}</span></div>
-                  <div class="fixed-row-amount">\${money.format(Number(item.amount))}</div>
+                  <div class="fixed-row-title"><strong>${escapeHTML(item.concept)}</strong><span class="fixed-status ${status === "Pagada" ? "is-paid" : status === "Vencida" ? "is-overdue" : "is-pending"}">${status}</span></div>
+                  <div class="fixed-row-amount">${money.format(Number(item.amount))}</div>
                 </div>
-                <div class="fixed-row-meta"><span>Vence: \${dateLabel(item.dueDate)}</span><span>\${escapeHTML(item.category || "Sin categoría")}</span></div>
-                <div class="fixed-progress"><span>Abonado: \${money.format(paid)}</span><span>Saldo: <strong>\${money.format(balance)}</strong></span></div>
-                \${(item.payments || []).length ? \`<details class="fixed-history"><summary>Ver \${item.payments.length} \${item.payments.length === 1 ? "pago registrado" : "pagos registrados"}</summary>\${item.payments.slice().sort((a,b) => b.date.localeCompare(a.date)).map(payment => \`<div class="fixed-payment-line"><span>\${dateLabel(payment.date)}</span><strong>\${money.format(payment.amount)}</strong></div>\`).join("")}</details>\` : ""}
-                \${payingId === item.id ? \`
-                  <form class="fixed-pay-form" data-pay-form="\${escapeHTML(item.id)}">
-                    <label>Importe a pagar<input name="paymentAmount" type="text" inputmode="decimal" autocomplete="off" value="\${balance.toFixed(2).replace(".", ",")}" required></label>
-                    <label>Fecha del pago<input name="paymentDate" type="date" value="\${today()}" required></label>
+                <div class="fixed-row-meta"><span>Vence: ${dateLabel(item.dueDate)}</span><span>${escapeHTML(item.category || "Sin categoría")}</span></div>
+                <div class="fixed-progress"><span>Abonado: ${money.format(paid)}</span><span>Saldo: <strong>${money.format(balance)}</strong></span></div>
+                ${(item.payments || []).length ? `<details class="fixed-history"><summary>Ver ${item.payments.length} ${item.payments.length === 1 ? "pago registrado" : "pagos registrados"}</summary>${item.payments.slice().sort((a,b) => b.date.localeCompare(a.date)).map(payment => `<div class="fixed-payment-line"><span>${dateLabel(payment.date)}</span><strong>${money.format(payment.amount)}</strong></div>`).join("")}</details>` : ""}
+                ${payingId === item.id ? `
+                  <form class="fixed-pay-form" data-pay-form="${escapeHTML(item.id)}">
+                    <label>Importe a pagar<input name="paymentAmount" type="text" inputmode="decimal" autocomplete="off" value="${balance.toFixed(2).replace(".", ",")}" required></label>
+                    <label>Fecha del pago<input name="paymentDate" type="date" value="${today()}" required></label>
                     <div><button class="primary-button" type="submit">Confirmar pago</button><button class="secondary-button" type="button" data-cancel-pay>Cancelar</button></div>
-                  </form>\` : ""}
+                  </form>` : ""}
                 <div class="fixed-row-actions">
-                  \${!isPaid(item) ? \`<button type="button" class="primary-button small-button" data-pay="\${escapeHTML(item.id)}">Registrar pago</button>\` : ""}
-                  <button type="button" class="text-button" data-edit-fixed="\${escapeHTML(item.id)}">Editar</button>
-                  <button type="button" class="text-button danger-text" data-delete-fixed="\${escapeHTML(item.id)}">Eliminar</button>
+                  ${!isPaid(item) ? `<button type="button" class="primary-button small-button" data-pay="${escapeHTML(item.id)}">Registrar pago</button>` : ""}
+                  <button type="button" class="text-button" data-edit-fixed="${escapeHTML(item.id)}">Editar</button>
+                  <button type="button" class="text-button danger-text" data-delete-fixed="${escapeHTML(item.id)}">Eliminar</button>
                 </div>
-              </article>\`;
+              </article>`;
           }).join("") : '<div class="panel income-empty"><div class="empty-icon">▤</div><h3>No hay obligaciones registradas</h3><p>Cuando cargues una factura o cuota, va a aparecer acá.</p></div>'}
         </div>
-      </section>\`;
+      </section>`;
 
     container.querySelector("#fixed-month").addEventListener("change", event => {
       selectedMonth = event.target.value; editingId = null; payingId = null; render();
@@ -255,8 +254,8 @@ export async function mountFixedExpenses(container) {
       const item = expenses.find(entry => entry.id === button.dataset.deleteFixed);
       if (!item) return;
       const warning = (item.payments || []).length
-        ? \`¿Eliminar "\${item.concept}" y sus \${item.payments.length} pagos registrados? Esta acción no se puede deshacer.\`
-        : \`¿Eliminar la obligación "\${item.concept}"? Esta acción no se puede deshacer.\`;
+        ? `¿Eliminar "${item.concept}" y sus ${item.payments.length} pagos registrados? Esta acción no se puede deshacer.`
+        : `¿Eliminar la obligación "${item.concept}"? Esta acción no se puede deshacer.`;
       if (!confirm(warning)) return;
       try {
         await deleteRecord("gastosFijos", item.id);
