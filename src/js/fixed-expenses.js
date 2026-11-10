@@ -86,13 +86,16 @@ export async function mountFixedExpenses(container) {
   const load = async () => {
     [expenses, categories] = await Promise.all([getAll("gastosFijos"), getAll("categorias")]);
     categories = categories.filter(category => !category.module || category.module === "gastosFijos");
+    for (const item of expenses) {
+      if (item.category && !categories.some(category => category.name === item.category)) categories.push({ id: `legacy-${item.category}`, name: item.category, module: "gastosFijos" });
+    }
   };
 
   const render = async () => {
     await load();
     const monthItems = expenses.filter(item => {
       const dueMonth = (item.dueDate || item.registeredAt || "").slice(0, 7);
-      return dueMonth === selectedMonth || (!isPaid(item) && dueMonth < selectedMonth);
+      return dueMonth === selectedMonth || (!isPaid(item) && dueMonth < selectedMonth) || (item.payments || []).some(payment => payment.date?.slice(0, 7) === selectedMonth);
     }).sort((a, b) => (a.dueDate || "").localeCompare(b.dueDate || "") || (a.createdAt || 0) - (b.createdAt || 0));
     const paidThisMonth = expenses.reduce((sum, item) => sum + (item.payments || [])
       .filter(payment => payment.date?.slice(0, 7) === selectedMonth)
