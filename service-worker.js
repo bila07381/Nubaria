@@ -1,10 +1,11 @@
-const CACHE_NAME = "nubaria-shell-v3";
+const CACHE_NAME = "nubaria-shell-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./manifest.webmanifest",
   "./src/js/app.js",
+  "./src/js/incomes.js",
   "./src/js/database.js",
   "./icons/nubaria.svg"
 ];
