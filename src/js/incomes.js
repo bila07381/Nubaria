@@ -7,24 +7,24 @@ const money = new Intl.NumberFormat("es-AR", {
 });
 
 function parseAmount(raw) {
-  let value = String(raw ?? "").trim().replace(/\\s/g, "");
+  let value = String(raw ?? "").trim().replace(/\s/g, "");
   if (!value) return NaN;
 
   // Con ambos separadores, el último se toma como decimal.
   if (value.includes(",") && value.includes(".")) {
     if (value.lastIndexOf(",") > value.lastIndexOf(".")) {
-      value = value.replace(/\\./g, "").replace(",", ".");
+      value = value.replace(/\./g, "").replace(",", ".");
     } else {
       value = value.replace(/,/g, "");
     }
   } else if (value.includes(",")) {
     value = value.replace(",", ".");
-  } else if (/^\\d{1,3}(\\.\\d{3})+$/.test(value)) {
+  } else if (/^\d{1,3}(\.\d{3})+$/.test(value)) {
     // Un punto seguido de grupos de tres cifras se interpreta como miles.
-    value = value.replace(/\\./g, "");
+    value = value.replace(/\./g, "");
   }
 
-  return /^\\d+(\\.\\d{1,2})?$/.test(value) ? Number(value) : NaN;
+  return /^\d+(\.\d{1,2})?$/.test(value) ? Number(value) : NaN;
 }
 
 const today = () => {
