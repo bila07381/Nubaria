@@ -167,14 +167,53 @@ export async function mountFixedExpenses(container) {
     const categorySelect = container.querySelector("#fixed-category");
     categorySelect.addEventListener("change", async () => {
       if (categorySelect.value !== "__new__") return;
+
+      // Crear una categoría sin volver a dibujar el formulario:
+      // así se conservan todos los campos que el usuario ya completó.
+      const formElement = container.querySelector("#fixed-form");
+      const draft = {
+        concept: formElement.elements.concept.value,
+        amount: formElement.elements.amount.value,
+        dueDate: formElement.elements.dueDate.value
+      };
       const name = prompt("Nombre de la nueva categoría:");
-      if (name?.trim()) {
-        const clean = name.trim().slice(0, 40);
-        const exists = categories.some(category => category.name.toLowerCase() === clean.toLowerCase());
-        if (!exists) await putRecord("categorias", { id: id(), name: clean, module: "gastosFijos", createdAt: Date.now() });
+      if (!name?.trim()) {
+        categorySelect.value = "";
+        return;
       }
-      await render();
-      container.querySelector("#fixed-category").value = name?.trim() || "";
+
+      const clean = name.trim().slice(0, 40);
+      if (!clean) {
+        categorySelect.value = "";
+        return;
+      }
+
+      let category = categories.find(item => item.name.toLowerCase() === clean.toLowerCase());
+      if (!category) {
+        category = { id: id(), name: clean, module: "gastosFijos", createdAt: Date.now() };
+        try {
+          await putRecord("categorias", category);
+          categories.push(category);
+        } catch (error) {
+          console.error(error);
+          alert("No se pudo guardar la categoría. Intentá nuevamente.");
+          categorySelect.value = "";
+          return;
+        }
+      }
+
+      const option = [...categorySelect.options].find(item => item.value === category.name);
+      if (!option) {
+        const newOption = document.createElement("option");
+        newOption.value = category.name;
+        newOption.textContent = category.name;
+        categorySelect.insertBefore(newOption, categorySelect.options[categorySelect.options.length - 1]);
+      }
+
+      formElement.elements.concept.value = draft.concept;
+      formElement.elements.amount.value = draft.amount;
+      formElement.elements.dueDate.value = draft.dueDate;
+      categorySelect.value = category.name;
     });
 
     const conceptInput = container.querySelector("#fixed-concept");
