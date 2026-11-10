@@ -6,6 +6,27 @@ const money = new Intl.NumberFormat("es-AR", {
   maximumFractionDigits: 2
 });
 
+function parseAmount(raw) {
+  let value = String(raw ?? "").trim().replace(/\\s/g, "");
+  if (!value) return NaN;
+
+  // Con ambos separadores, el último se toma como decimal.
+  if (value.includes(",") && value.includes(".")) {
+    if (value.lastIndexOf(",") > value.lastIndexOf(".")) {
+      value = value.replace(/\\./g, "").replace(",", ".");
+    } else {
+      value = value.replace(/,/g, "");
+    }
+  } else if (value.includes(",")) {
+    value = value.replace(",", ".");
+  } else if (/^\\d{1,3}(\\.\\d{3})+$/.test(value)) {
+    // Un punto seguido de grupos de tres cifras se interpreta como miles.
+    value = value.replace(/\\./g, "");
+  }
+
+  return /^\\d+(\\.\\d{1,2})?$/.test(value) ? Number(value) : NaN;
+}
+
 const today = () => {
   const now = new Date();
   const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
@@ -94,7 +115,7 @@ export async function mountIncomes(container) {
           <h3>${editingId ? "Editar ingreso" : "Registrar ingreso"}</h3>
           <form id="income-form" class="income-form">
             <label>Concepto<input id="income-concept" name="concept" maxlength="100" placeholder="Ej. Sueldo" required></label>
-            <label>Importe<input id="income-amount" name="amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0,00" required></label>
+            <label>Importe<input id="income-amount" name="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="Ej. 125000,50 o 125000.50" required></label>
             <label>Fecha de cobro<input id="income-date" name="date" type="date" value="${today()}" required></label>
             <div class="income-form-actions"><button class="primary-button" type="submit">${editingId ? "Guardar cambios" : "Guardar ingreso"}</button>${editingId ? '<button class="secondary-button" id="income-cancel" type="button">Cancelar</button>' : ""}</div>
           </form>
@@ -119,7 +140,7 @@ export async function mountIncomes(container) {
       event.preventDefault();
       const form = new FormData(event.currentTarget);
       const concept = String(form.get("concept") || "").trim();
-      const amount = Number(form.get("amount"));
+      const amount = parseAmount(form.get("amount"));
       const date = String(form.get("date") || "");
       if (!concept || !Number.isFinite(amount) || amount <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         alert("Revisá el concepto, el importe y la fecha.");
