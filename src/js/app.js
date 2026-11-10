@@ -1,4 +1,5 @@
 import { openNubariaDB } from "./database.js";
+import { mountIncomes } from "./incomes.js";
 
 const screenNames = {
   inicio: "Inicio",
@@ -33,7 +34,9 @@ function showScreen(screen) {
     button.classList.toggle("active", button.dataset.screen === name);
   });
 
-  if (name === "inicio") {
+  if (name === "ingresos") {
+    mountIncomes(content);
+  } else if (name === "inicio") {
     content.innerHTML = `
       <div class="welcome-card">
         <div><p class="eyebrow">BIENVENIDO A</p><h2>Nubaria</h2><p>Un lugar para organizar tus finanzas con tranquilidad.</p></div>
