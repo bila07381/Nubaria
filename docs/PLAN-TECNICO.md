@@ -67,3 +67,18 @@ Motivos:
 - Funciona de manera asíncrona y es adecuado para una aplicación que debe trabajar sin conexión.
 
 IndexedDB no reemplaza las copias de seguridad ni proporciona sincronización entre dispositivos. Esas funciones se resolverán por separado.
+
+## 8. Tecnologías elegidas para la primera versión
+
+**Decisión acordada:** desarrollar Nubaria con una base de tecnologías web conocida y sencilla:
+
+- **HTML** para la estructura de las pantallas.
+- **CSS** para el diseño adaptable, los temas claro y nocturno y la presentación visual.
+- **JavaScript** para la navegación, las interacciones y las reglas de negocio.
+- **IndexedDB** para la persistencia local de los datos.
+- **PWA y Service Worker** para permitir la instalación opcional y el funcionamiento sin conexión mediante caché de recursos.
+- **GitHub** para versionar y conservar el código fuente.
+
+La arquitectura deberá separar interfaz, lógica de negocio y acceso a datos, con módulos claros y pruebas progresivas. Se prioriza esta opción porque permite aprovechar la experiencia previa del proyecto y mantener bajos los costos iniciales.
+
+La eventual publicación en Google Play se evaluará más adelante (por ejemplo, con Trusted Web Activity o Capacitor), según las necesidades reales de la aplicación.
