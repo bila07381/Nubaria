@@ -101,7 +101,8 @@ export async function mountFixedExpenses(container) {
       .filter(payment => payment.date?.slice(0, 7) === selectedMonth)
       .reduce((part, payment) => part + Number(payment.amount || 0), 0), 0);
     const pendingTotal = monthItems.reduce((sum, item) => sum + remaining(item), 0);
-    const monthOptions = [...new Set([monthNow(), ...expenses.map(item => item.dueDate?.slice(0, 7)).filter(Boolean)])]
+    const paymentMonths = expenses.flatMap(item => (item.payments || []).map(payment => payment.date?.slice(0, 7))).filter(Boolean);
+    const monthOptions = [...new Set([monthNow(), ...expenses.map(item => item.dueDate?.slice(0, 7)).filter(Boolean), ...paymentMonths])]
       .sort((a, b) => b.localeCompare(a));
 
     container.innerHTML = `
