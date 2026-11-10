@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Nubaria — Tus finanzas, en calma",
+  "short_name": "Nubaria",
+  "description": "Organizá tus finanzas personales y familiares.",
+  "lang": "es-AR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1426",
+  "theme_color": "#101b32",
+  "icons": [
+    {
+      "src": "./icons/nubaria.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
