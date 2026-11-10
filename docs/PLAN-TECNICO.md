@@ -56,3 +56,14 @@ La publicación en Play Store podrá evaluarse mediante tecnologías como Truste
 ## 6. Criterio de trabajo
 
 No se modifican otros repositorios. Las decisiones funcionales y visuales importantes se revisan con el responsable del producto antes de implementarse.
+
+## 7. Almacenamiento local elegido
+
+**Decisión acordada:** utilizar **IndexedDB** como almacenamiento local principal de Nubaria en la primera versión.
+
+Motivos:
+- Está integrado en los navegadores modernos, por lo que el usuario no tendrá que instalar ni configurar una base de datos.
+- Está pensado para guardar datos estructurados y permite manejar más información y consultas más complejas que alternativas simples como LocalStorage.
+- Funciona de manera asíncrona y es adecuado para una aplicación que debe trabajar sin conexión.
+
+IndexedDB no reemplaza las copias de seguridad ni proporciona sincronización entre dispositivos. Esas funciones se resolverán por separado.
