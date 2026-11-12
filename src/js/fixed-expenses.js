@@ -1,3 +1,4 @@
+import { showNubariaMessage, showNubariaConfirm } from "./dialogs.js";
 import { openNubariaDB } from "./database.js";
 
 const money = new Intl.NumberFormat("es-AR", {
@@ -217,7 +218,7 @@ export async function mountFixedExpenses(container) {
           categories.push(category);
         } catch (error) {
           console.error(error);
-          alert("No se pudo guardar la categoría. Intentá nuevamente.");
+          await showNubariaMessage("No se pudo guardar la categoría. Intentá nuevamente.");
           categorySelect.value = "";
           return;
         }
@@ -253,10 +254,10 @@ export async function mountFixedExpenses(container) {
       const previous = editingId ? expenses.find(item => item.id === editingId) : null;
       const alreadyPaid = previous ? sumPaid(previous) : 0;
       if (!concept || !Number.isFinite(amount) || amount <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
-        alert("Revisá el concepto, el importe y el vencimiento."); return;
+        await showNubariaMessage("Revisá el concepto, el importe y el vencimiento."); return;
       }
       if (amount + 0.004 < alreadyPaid) {
-        alert("El importe total no puede ser menor a lo que ya se abonó."); return;
+        await showNubariaMessage("El importe total no puede ser menor a lo que ya se abonó."); return;
       }
       const record = {
         id: editingId || id(), concept, amount, dueDate, category,
@@ -270,7 +271,7 @@ export async function mountFixedExpenses(container) {
         selectedMonth = dueDate.slice(0, 7); editingId = null; payingId = null;
         await render();
       } catch (error) {
-        console.error(error); alert("No se pudo guardar la obligación. Intentá nuevamente.");
+        console.error(error); await showNubariaMessage("No se pudo guardar la obligación. Intentá nuevamente.");
       }
     });
 
@@ -288,7 +289,7 @@ export async function mountFixedExpenses(container) {
       const amount = parseAmount(form.get("paymentAmount"));
       const date = String(form.get("paymentDate") || "");
       if (!Number.isFinite(amount) || amount <= 0 || amount > remaining(item) + 0.004 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        alert("Revisá el importe y la fecha. El pago no puede superar el saldo pendiente."); return;
+        await showNubariaMessage("Revisá el importe y la fecha. El pago no puede superar el saldo pendiente."); return;
       }
       const record = { ...item, payments: [...(item.payments || []), { id: id(), amount, date, createdAt: Date.now() }], updatedAt: Date.now() };
       try {
@@ -297,7 +298,7 @@ export async function mountFixedExpenses(container) {
         selectedMonth = date.slice(0, 7);
         await render();
       } catch (error) {
-        console.error(error); alert("No se pudo registrar el pago.");
+        console.error(error); await showNubariaMessage("No se pudo registrar el pago.");
       }
     }));
 
@@ -320,13 +321,13 @@ export async function mountFixedExpenses(container) {
       const warning = (item.payments || []).length
         ? `¿Eliminar "${item.concept}" y sus ${item.payments.length} pagos registrados? Esta acción no se puede deshacer.`
         : `¿Eliminar la obligación "${item.concept}"? Esta acción no se puede deshacer.`;
-      if (!confirm(warning)) return;
+      if (!await showNubariaConfirm(warning)) return;
       try {
         await deleteRecord("gastosFijos", item.id);
         if (editingId === item.id) editingId = null;
         await render();
       } catch (error) {
-        console.error(error); alert("No se pudo eliminar la obligación.");
+        console.error(error); await showNubariaMessage("No se pudo eliminar la obligación.");
       }
     }));
 
