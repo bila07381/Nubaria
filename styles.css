@@ -23,3 +23,16 @@
 :root[data-theme="light"] .payment-total{background:linear-gradient(115deg,#f9e8ed,#f4dce5);border-color:#e8c4d0;color:#672f45}
 :root[data-theme="light"] .payment-total span,:root[data-theme="light"] .payment-total small{color:#89566a}
 @media(max-width:800px){.payment-form{grid-template-columns:1fr}.payment-form-actions{grid-column:auto}.payment-row{align-items:flex-start}.payment-row .income-row-main{flex:1}.payment-row .income-row-end{flex-shrink:0}}
+
+
+/* Diálogo propio de Nubaria para crear categorías */
+.nubaria-dialog{width:min(92vw,440px);max-width:440px;padding:0;border:1px solid var(--line);border-radius:20px;background:var(--surface);color:var(--text);box-shadow:0 24px 80px #0005}
+.nubaria-dialog::backdrop{background:#07111dcc;backdrop-filter:blur(3px)}
+.nubaria-dialog-card{display:grid;gap:12px;padding:26px}
+.nubaria-dialog-card h3{margin:0;font-size:22px;color:var(--text)}
+.nubaria-dialog-card p{margin:0 0 4px;color:var(--muted);font-size:14px}
+.nubaria-dialog-card label{font-size:13px;font-weight:600;color:var(--muted)}
+.nubaria-dialog-card input{width:100%;min-height:48px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--background,var(--surface));color:var(--text);font:inherit;outline:none}
+.nubaria-dialog-card input:focus{border-color:var(--accent,#5b9bd5);box-shadow:0 0 0 3px #5b9bd522}
+.nubaria-dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
+@media(max-width:480px){.nubaria-dialog-card{padding:22px}.nubaria-dialog-actions button{flex:1}}
