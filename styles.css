@@ -16,3 +16,10 @@
 @media(max-width:800px){.fixed-toolbar{align-items:stretch;flex-direction:column}.fixed-summary{grid-template-columns:1fr}.fixed-form{grid-template-columns:1fr}.fixed-form-actions{grid-column:auto}.fixed-row-top{align-items:flex-start}.fixed-row-meta{align-items:flex-start;flex-direction:column;gap:4px}.fixed-pay-form{grid-template-columns:1fr}.fixed-pay-form>div{grid-column:auto}.fixed-row-actions{flex-wrap:wrap}}
 :root[data-theme="light"] .fixed-stat.paid{background:linear-gradient(115deg,#eff9f5,#e2f3ec)}
 :root[data-theme="light"] .fixed-stat.pending{background:linear-gradient(115deg,#fff8ec,#f9eedc)}
+
+
+/* Módulo Pagos */
+.payment-screen{display:grid;gap:18px}.payment-form{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr 1fr;gap:14px;margin-top:18px}.payment-form label{display:grid;gap:7px;color:var(--muted);font-size:12px;font-weight:600}.payment-form input,.payment-form select{width:100%;min-height:43px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);color:var(--text);font:inherit}.payment-form-actions{grid-column:1/-1;display:flex;gap:9px}.payment-total{background:linear-gradient(115deg,#472b3a,#593044);border-color:#81465b}.payment-total span,.payment-total small{color:#f0c5d2}.payment-icon{color:#e58a9d;background:#e58a9d1a}.payment-row .income-row-main{min-width:0}.payment-row .income-row-main div{min-width:0}.payment-row .income-row-main strong{overflow-wrap:anywhere}.payment-row .income-row-main small{line-height:1.5}
+:root[data-theme="light"] .payment-total{background:linear-gradient(115deg,#f9e8ed,#f4dce5);border-color:#e8c4d0;color:#672f45}
+:root[data-theme="light"] .payment-total span,:root[data-theme="light"] .payment-total small{color:#89566a}
+@media(max-width:800px){.payment-form{grid-template-columns:1fr}.payment-form-actions{grid-column:auto}.payment-row{align-items:flex-start}.payment-row .income-row-main{flex:1}.payment-row .income-row-end{flex-shrink:0}}
