@@ -1,3 +1,4 @@
+import { showNubariaMessage, showNubariaConfirm } from "./dialogs.js";
 import { openNubariaDB } from "./database.js";
 
 const money = new Intl.NumberFormat("es-AR", {
@@ -199,7 +200,7 @@ export async function mountPayments(container) {
           categories.push(category);
         } catch (error) {
           console.error(error);
-          alert("No se pudo guardar la categoría. Intentá nuevamente.");
+          await showNubariaMessage("No se pudo guardar la categoría. Intentá nuevamente.");
           return;
         }
       }
@@ -223,7 +224,7 @@ export async function mountPayments(container) {
       const method = String(form.get("method") || "Débito");
       const category = String(form.get("category") || "Sin categoría");
       if (!concept || !Number.isFinite(amount) || amount <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        alert("Revisá el concepto, el importe y la fecha.");
+        await showNubariaMessage("Revisá el concepto, el importe y la fecha.");
         return;
       }
       const previous = editingId ? payments.find(item => item.id === editingId) : null;
@@ -238,7 +239,7 @@ export async function mountPayments(container) {
         await render();
       } catch (error) {
         console.error(error);
-        alert("No se pudo guardar el pago. Intentá nuevamente.");
+        await showNubariaMessage("No se pudo guardar el pago. Intentá nuevamente.");
       }
     });
 
@@ -258,14 +259,14 @@ export async function mountPayments(container) {
 
     container.querySelectorAll("[data-delete-payment]").forEach(button => button.addEventListener("click", async () => {
       const item = payments.find(entry => entry.id === button.dataset.deletePayment);
-      if (!item || !confirm(`¿Eliminar el pago "${item.concept}"? Esta acción no se puede deshacer.`)) return;
+      if (!item || !await showNubariaConfirm(`¿Eliminar el pago "${item.concept}"? Esta acción no se puede deshacer.`)) return;
       try {
         await deleteRecord("pagos", item.id);
         if (editingId === item.id) editingId = null;
         await render();
       } catch (error) {
         console.error(error);
-        alert("No se pudo eliminar el pago.");
+        await showNubariaMessage("No se pudo eliminar el pago.");
       }
     }));
 
