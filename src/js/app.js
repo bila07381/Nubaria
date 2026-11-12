@@ -1,7 +1,7 @@
 import { openNubariaDB } from "./database.js";
 import { mountIncomes } from "./incomes.js";
-import { mountFixedExpenses } from "./fixed-expenses.js";
-import { mountPayments } from "./payments.js";
+import { mountFixedExpenses } from "./fixed-expenses.js?v=2";
+import { mountPayments } from "./payments.js?v=2";
 
 const screenNames = {
   inicio: "Inicio",
