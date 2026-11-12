@@ -148,7 +148,20 @@ export async function mountPayments(container) {
               </div>
             </article>`).join("") : '<div class="panel income-empty"><div class="empty-icon">↘</div><h3>Todavía no hay pagos</h3><p>Cuando registres un gasto cotidiano, lo vas a encontrar acá.</p></div>'}
         </div>
-      </section>`;
+      </section>
+      <dialog id="payment-category-dialog" class="nubaria-dialog">
+        <form id="payment-category-form" class="nubaria-dialog-card">
+          <span class="eyebrow">PERSONALIZÁ NUBARIA</span>
+          <h3>Nueva categoría</h3>
+          <p>Elegí un nombre para organizar este gasto.</p>
+          <label for="payment-new-category">Nombre de la categoría</label>
+          <input id="payment-new-category" name="categoryName" maxlength="40" placeholder="Ej. Supermercado" required>
+          <div class="nubaria-dialog-actions">
+            <button type="button" class="secondary-button" id="payment-category-cancel">Cancelar</button>
+            <button type="submit" class="primary-button">Guardar categoría</button>
+          </div>
+        </form>
+      </dialog>`;
 
     container.querySelector("#payment-month").addEventListener("change", event => {
       selectedMonth = event.target.value;
@@ -157,14 +170,27 @@ export async function mountPayments(container) {
     });
 
     const categorySelect = container.querySelector("#payment-category");
-    categorySelect.addEventListener("change", async () => {
+    const categoryDialog = container.querySelector("#payment-category-dialog");
+    const categoryForm = container.querySelector("#payment-category-form");
+    const categoryInput = container.querySelector("#payment-new-category");
+    const closeCategoryDialog = () => {
+      categoryDialog.close();
+      categorySelect.value = "Sin categoría";
+    };
+    categorySelect.addEventListener("change", () => {
       if (categorySelect.value !== "__new__") return;
-      const name = prompt("Nombre de la nueva categoría:");
-      if (!name?.trim()) {
-        categorySelect.value = "Sin categoría";
-        return;
-      }
-      const clean = name.trim().slice(0, 40);
+      categoryInput.value = "";
+      categoryDialog.showModal();
+      categoryInput.focus();
+    });
+    container.querySelector("#payment-category-cancel").addEventListener("click", closeCategoryDialog);
+    categoryDialog.addEventListener("click", event => {
+      if (event.target === categoryDialog) closeCategoryDialog();
+    });
+    categoryForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      const clean = categoryInput.value.trim().slice(0, 40);
+      if (!clean) return;
       let category = categories.find(item => item.name.toLowerCase() === clean.toLowerCase());
       if (!category) {
         category = { id: id(), name: clean, module: "pagos", createdAt: Date.now() };
@@ -174,7 +200,6 @@ export async function mountPayments(container) {
         } catch (error) {
           console.error(error);
           alert("No se pudo guardar la categoría. Intentá nuevamente.");
-          categorySelect.value = "Sin categoría";
           return;
         }
       }
@@ -186,6 +211,7 @@ export async function mountPayments(container) {
         categorySelect.insertBefore(option, categorySelect.options[categorySelect.options.length - 1]);
       }
       categorySelect.value = category.name;
+      categoryDialog.close();
     });
 
     container.querySelector("#payment-form").addEventListener("submit", async event => {
