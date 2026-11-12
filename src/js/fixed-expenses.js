@@ -158,7 +158,20 @@ export async function mountFixedExpenses(container) {
               </article>`;
           }).join("") : '<div class="panel income-empty"><div class="empty-icon">▤</div><h3>No hay obligaciones registradas</h3><p>Cuando cargues una factura o cuota, va a aparecer acá.</p></div>'}
         </div>
-      </section>`;
+      </section>
+      <dialog id="fixed-category-dialog" class="nubaria-dialog">
+        <form id="fixed-category-form" class="nubaria-dialog-card">
+          <span class="eyebrow">PERSONALIZÁ NUBARIA</span>
+          <h3>Nueva categoría</h3>
+          <p>Elegí un nombre para organizar esta obligación.</p>
+          <label for="fixed-new-category">Nombre de la categoría</label>
+          <input id="fixed-new-category" name="categoryName" maxlength="40" placeholder="Ej. Servicios" required>
+          <div class="nubaria-dialog-actions">
+            <button type="button" class="secondary-button" id="fixed-category-cancel">Cancelar</button>
+            <button type="submit" class="primary-button">Guardar categoría</button>
+          </div>
+        </form>
+      </dialog>`;
 
     container.querySelector("#fixed-month").addEventListener("change", event => {
       selectedMonth = event.target.value; editingId = null; payingId = null; render();
@@ -176,18 +189,26 @@ export async function mountFixedExpenses(container) {
         amount: formElement.elements.amount.value,
         dueDate: formElement.elements.dueDate.value
       };
-      const name = prompt("Nombre de la nueva categoría:");
-      if (!name?.trim()) {
-        categorySelect.value = "";
-        return;
-      }
-
-      const clean = name.trim().slice(0, 40);
-      if (!clean) {
-        categorySelect.value = "";
-        return;
-      }
-
+      const categoryDialog = container.querySelector("#fixed-category-dialog");
+      const categoryInput = container.querySelector("#fixed-new-category");
+      const categoryForm = container.querySelector("#fixed-category-form");
+      categoryInput.value = "";
+      const clean = await new Promise(resolve => {
+        const finish = value => {
+          categoryDialog.close();
+          categoryForm.removeEventListener("submit", onSubmit);
+          container.querySelector("#fixed-category-cancel").removeEventListener("click", onCancel);
+          resolve(value);
+        };
+        const onSubmit = event => { event.preventDefault(); finish(categoryInput.value.trim().slice(0, 40)); };
+        const onCancel = () => finish("");
+        categoryForm.addEventListener("submit", onSubmit);
+        container.querySelector("#fixed-category-cancel").addEventListener("click", onCancel);
+        categoryDialog.addEventListener("cancel", onCancel, { once: true });
+        categoryDialog.showModal();
+        categoryInput.focus();
+      });
+      if (!clean) { categorySelect.value = ""; return; }
       let category = categories.find(item => item.name.toLowerCase() === clean.toLowerCase());
       if (!category) {
         category = { id: id(), name: clean, module: "gastosFijos", createdAt: Date.now() };
