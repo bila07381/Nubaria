@@ -1,3 +1,4 @@
+import { showNubariaMessage, showNubariaConfirm } from "./dialogs.js";
 import { openNubariaDB } from "./database.js";
 
 const money = new Intl.NumberFormat("es-AR", {
@@ -143,7 +144,7 @@ export async function mountIncomes(container) {
       const amount = parseAmount(form.get("amount"));
       const date = String(form.get("date") || "");
       if (!concept || !Number.isFinite(amount) || amount <= 0 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        alert("Revisá el concepto, el importe y la fecha.");
+        await showNubariaMessage("Revisá el concepto, el importe y la fecha.");
         return;
       }
       const previous = editingId ? all.find(item => item.id === editingId) : null;
@@ -162,7 +163,7 @@ export async function mountIncomes(container) {
         await render();
       } catch (error) {
         console.error(error);
-        alert("No se pudo guardar el ingreso. Intentá nuevamente.");
+        await showNubariaMessage("No se pudo guardar el ingreso. Intentá nuevamente.");
       }
     });
 
@@ -183,14 +184,14 @@ export async function mountIncomes(container) {
     container.querySelectorAll("[data-delete]").forEach(button => {
       button.addEventListener("click", async () => {
         const item = all.find(entry => entry.id === button.dataset.delete);
-        if (!item || !confirm(`¿Eliminar el ingreso "${item.concept}"? Esta acción no se puede deshacer.`)) return;
+        if (!item || !await showNubariaConfirm(`¿Eliminar el ingreso "${item.concept}"? Esta acción no se puede deshacer.`)) return;
         try {
           await deleteIncome(item.id);
           if (editingId === item.id) editingId = null;
           await render();
         } catch (error) {
           console.error(error);
-          alert("No se pudo eliminar el ingreso.");
+          await showNubariaMessage("No se pudo eliminar el ingreso.");
         }
       });
     });
