@@ -1,4 +1,4 @@
-const CACHE_NAME = "nubaria-shell-v7";
+const CACHE_NAME = "nubaria-shell-v8";
 const APP_SHELL = [
   "./",
   "./index.html",
