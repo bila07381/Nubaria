@@ -1,6 +1,7 @@
 import { openNubariaDB } from "./database.js";
 import { mountIncomes } from "./incomes.js";
 import { mountFixedExpenses } from "./fixed-expenses.js";
+import { mountPayments } from "./payments.js";
 
 const screenNames = {
   inicio: "Inicio",
@@ -39,6 +40,8 @@ function showScreen(screen) {
     mountIncomes(content);
   } else if (name === "gastos-fijos") {
     mountFixedExpenses(content);
+  } else if (name === "pagos") {
+    mountPayments(content);
   } else if (name === "inicio") {
     content.innerHTML = `
       <div class="welcome-card">
