@@ -1,4 +1,4 @@
-const CACHE_NAME = "nubaria-shell-v12";
+const CACHE_NAME = "nubaria-shell-v13";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -31,6 +31,21 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET" || new URL(event.request.url).origin !== self.location.origin) return;
+
+  const isCodeOrStyle = ["script", "style"].includes(event.request.destination);
+  if (isCodeOrStyle) {
+    // Primero busca la versión publicada; si no hay conexión, usa la copia local.
+    event.respondWith(
+      fetch(event.request).then(response => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+        }
+        return response;
+      }).catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then(cached => {
