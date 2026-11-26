@@ -300,7 +300,9 @@ export async function mountFixedExpenses(container) {
       editingId = item.id; payingId = null;
       render().then(() => {
         container.querySelector("#fixed-concept").value = item.concept;
-        container.querySelector("#fixed-amount").value = String(item.amount).replace(".", ",");
+        const amountInput = container.querySelector("#fixed-amount");
+        amountInput.value = String(item.amount).replace(".", ",");
+        amountInput.dispatchEvent(new Event("input", { bubbles: true }));
         container.querySelector("#fixed-due").value = item.dueDate;
         container.querySelector("#fixed-category").value = item.category || "";
         container.querySelector("#fixed-concept").focus();
