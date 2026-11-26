@@ -17,6 +17,7 @@ export function attachMoneyInput(input) {
   input.dataset.moneyAttached = "true";
   const format = () => {
     const current = input.value;
+    if (!digits(current)) { input.value = ""; return; }
     if (current.includes(",")) {
       const [wholeRaw, centsRaw = ""] = current.split(",");
       const whole = grouped(digits(wholeRaw));
