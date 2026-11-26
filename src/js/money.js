@@ -6,7 +6,7 @@ export function parseAmount(raw) {
     else value = value.replace(/,/g, "");
   } else if (value.includes(",")) value = value.replace(",", ".");
   else if (/^\d{1,3}(\.\d{3})+$/.test(value)) value = value.replace(/\./g, "");
-  return /^\d+(\.\d{1,2})?$/.test(value) ? Number(value) : NaN;
+  return /^\d+(\.\d{0,2})?$/.test(value) ? Number(value) : NaN;
 }
 
 const digits = value => String(value ?? "").replace(/\D/g, "");
