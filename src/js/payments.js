@@ -240,7 +240,9 @@ export async function mountPayments(container) {
       editingId = item.id;
       render().then(() => {
         container.querySelector("#payment-concept").value = item.concept;
-        container.querySelector("#payment-amount").value = String(item.amount).replace(".", ",");
+        const amountInput = container.querySelector("#payment-amount");
+        amountInput.value = String(item.amount).replace(".", ",");
+        amountInput.dispatchEvent(new Event("input", { bubbles: true }));
         container.querySelector("#payment-date").value = item.date;
         container.querySelector("#payment-method").value = item.method || "Débito";
         container.querySelector("#payment-category").value = item.category || "Sin categoría";
