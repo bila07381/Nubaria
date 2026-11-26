@@ -1,32 +1,12 @@
 import { showNubariaMessage, showNubariaConfirm } from "./dialogs.js";
 import { openNubariaDB } from "./database.js";
+import { parseAmount, attachMoneyInput } from "./money.js";
 
 const money = new Intl.NumberFormat("es-AR", {
   style: "currency",
   currency: "ARS",
   maximumFractionDigits: 2
 });
-
-function parseAmount(raw) {
-  let value = String(raw ?? "").trim().replace(/\s/g, "");
-  if (!value) return NaN;
-
-  // Con ambos separadores, el último se toma como decimal.
-  if (value.includes(",") && value.includes(".")) {
-    if (value.lastIndexOf(",") > value.lastIndexOf(".")) {
-      value = value.replace(/\./g, "").replace(",", ".");
-    } else {
-      value = value.replace(/,/g, "");
-    }
-  } else if (value.includes(",")) {
-    value = value.replace(",", ".");
-  } else if (/^\d{1,3}(\.\d{3})+$/.test(value)) {
-    // Un punto seguido de grupos de tres cifras se interpreta como miles.
-    value = value.replace(/\./g, "");
-  }
-
-  return /^\d+(\.\d{1,2})?$/.test(value) ? Number(value) : NaN;
-}
 
 const today = () => {
   const now = new Date();
@@ -131,6 +111,7 @@ export async function mountIncomes(container) {
         </div>
       </section>`;
 
+    attachMoneyInput(container.querySelector("#income-amount"));
     container.querySelector("#income-month").addEventListener("change", event => {
       selectedMonth = event.target.value;
       editingId = null;
