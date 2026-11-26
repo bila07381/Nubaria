@@ -49,4 +49,5 @@ export function attachMoneyInput(input) {
     }
     format();
   });
+  if (input.value) format();
 }
