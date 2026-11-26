@@ -155,7 +155,9 @@ export async function mountIncomes(container) {
         editingId = item.id;
         render().then(() => {
           container.querySelector("#income-concept").value = item.concept;
-          container.querySelector("#income-amount").value = item.amount;
+          const amountInput = container.querySelector("#income-amount");
+          amountInput.value = String(item.amount).replace(".", ",");
+          amountInput.dispatchEvent(new Event("input", { bubbles: true }));
           container.querySelector("#income-date").value = item.date;
           container.querySelector("#income-concept").focus();
         });
