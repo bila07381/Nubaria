@@ -1,14 +1,3 @@
-const digitsOnly = value => String(value ?? "").replace(/\D/g, "");
-
-export function formatMoneyInput(value, decimal = false) {
-  const digits = digitsOnly(value);
-  const wholeDigits = decimal ? digits.slice(0, -Math.min(digits.length, 2)) : digits;
-  const cents = decimal ? digits.slice(-2).padStart(Math.min(digits.length, 2), "0") : "";
-  const whole = (wholeDigits || "0").replace(/^0+(?=\d)/, "");
-  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return decimal ? grouped + "," + cents : grouped;
-}
-
 export function parseAmount(raw) {
   let value = String(raw ?? "").trim().replace(/\s/g, "");
   if (!value) return NaN;
@@ -20,45 +9,44 @@ export function parseAmount(raw) {
   return /^\d+(\.\d{1,2})?$/.test(value) ? Number(value) : NaN;
 }
 
+const digits = value => String(value ?? "").replace(/\D/g, "");
+const grouped = value => (value || "0").replace(/^0+(?=\d)/, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
 export function attachMoneyInput(input) {
   if (!input || input.dataset.moneyAttached) return;
   input.dataset.moneyAttached = "true";
-  input.dataset.moneyDecimal = "false";
-
-  const render = () => {
-    const digits = digitsOnly(input.value);
-    const decimal = input.dataset.moneyDecimal === "true";
-    const formatted = formatMoneyInput(digits, decimal);
-    input.value = formatted;
-    input.setSelectionRange(formatted.length, formatted.length);
-  };
-
-  input.addEventListener("keydown", event => {
-    if (event.key === "." || event.key === ",") {
-      if (input.dataset.moneyDecimal === "true") {
-        event.preventDefault();
-        return;
-      }
-      event.preventDefault();
-      input.dataset.moneyDecimal = "true";
-      render();
+  const format = () => {
+    const current = input.value;
+    if (current.includes(",")) {
+      const [wholeRaw, centsRaw = ""] = current.split(",");
+      const whole = grouped(digits(wholeRaw));
+      const cents = digits(centsRaw).slice(0, 2);
+      input.value = whole + "," + cents;
+    } else {
+      input.value = grouped(digits(current));
     }
+    input.setSelectionRange(input.value.length, input.value.length);
+  };
+  input.addEventListener("keydown", event => {
+    if (event.key !== "." && event.key !== ",") return;
+    event.preventDefault();
+    if (input.value.includes(",")) return;
+    const whole = grouped(digits(input.value));
+    input.value = whole + ",";
+    input.setSelectionRange(input.value.length, input.value.length);
   });
-
   input.addEventListener("input", event => {
     if (event.inputType === "insertFromPaste") {
-      const pasted = input.value;
-      const hasDecimal = /[,.]/.test(pasted);
-      input.dataset.moneyDecimal = hasDecimal ? "true" : "false";
-      if (hasDecimal) {
-        const parts = pasted.split(/[,.]/);
-        const digits = digitsOnly(parts.join(""));
-        const formatted = formatMoneyInput(digits, true);
-        input.value = formatted;
-        input.setSelectionRange(formatted.length, formatted.length);
+      const raw = input.value;
+      if (/[,.]/.test(raw)) {
+        const last = Math.max(raw.lastIndexOf(","), raw.lastIndexOf("."));
+        const whole = grouped(digits(raw.slice(0, last)));
+        const cents = digits(raw.slice(last + 1)).slice(0, 2);
+        input.value = whole + "," + cents;
+        input.setSelectionRange(input.value.length, input.value.length);
         return;
       }
     }
-    render();
+    format();
   });
 }
