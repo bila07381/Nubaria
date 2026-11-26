@@ -1,20 +1,10 @@
 import { showNubariaMessage, showNubariaConfirm } from "./dialogs.js";
 import { openNubariaDB } from "./database.js";
+import { parseAmount, attachMoneyInput } from "./money.js";
 
 const money = new Intl.NumberFormat("es-AR", {
   style: "currency", currency: "ARS", maximumFractionDigits: 2
 });
-
-function parseAmount(raw) {
-  let value = String(raw ?? "").trim().replace(/\s/g, "");
-  if (!value) return NaN;
-  if (value.includes(",") && value.includes(".")) {
-    if (value.lastIndexOf(",") > value.lastIndexOf(".")) value = value.replace(/\./g, "").replace(",", ".");
-    else value = value.replace(/,/g, "");
-  } else if (value.includes(",")) value = value.replace(",", ".");
-  else if (/^\d{1,3}(\.\d{3})+$/.test(value)) value = value.replace(/\./g, "");
-  return /^\d+(\.\d{1,2})?$/.test(value) ? Number(value) : NaN;
-}
 
 const today = () => {
   const now = new Date();
@@ -174,6 +164,8 @@ export async function mountFixedExpenses(container) {
         </form>
       </dialog>`;
 
+    attachMoneyInput(container.querySelector("#fixed-amount"));
+    container.querySelectorAll('input[name="paymentAmount"]').forEach(attachMoneyInput);
     container.querySelector("#fixed-month").addEventListener("change", event => {
       selectedMonth = event.target.value; editingId = null; payingId = null; render();
     });
